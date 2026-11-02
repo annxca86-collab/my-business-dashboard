@@ -110,6 +110,11 @@ export function computeMetrics(records, reportingDate, options = {}) {
   const byChannel = {};
   for (const s of inPeriod) { const k = s.channel || tr('(none)'); byChannel[k] = (byChannel[k] || 0) + s.amount; }
 
+  // Products by the order's offering name, else the stock item's name, else its id.
+  const stockName = new Map((records.stock || []).map(st => [st.id, st.name]));
+  const byProduct = {};
+  for (const s of inPeriod) { const k = s.description || stockName.get(s.item_id) || s.item_id || tr('(none)'); byProduct[k] = (byProduct[k] || 0) + s.amount; }
+
   return {
     version: METRICS_VERSION,
     reporting_date: reportingDate,
@@ -150,6 +155,7 @@ export function computeMetrics(records, reportingDate, options = {}) {
     comparison: { ...comparison, prior_order_value: priorOrderValue, growth },
     trend,
     by_channel: byChannel,
+    by_product: byProduct,
   };
 }
 

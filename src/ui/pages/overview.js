@@ -29,6 +29,11 @@ export function renderOverview() {
   add(grid, h('div', { class: 'card' }, t('h2', tr('Monthly order value')), t('div', tr('Eligible sales by sale date; the current month is partial.'), 'scope'), trendChart(m.trend, rd)));
   const channels = Object.entries(m.by_channel).sort((a, b) => b[1] - a[1]);
   if (channels.length > 1) add(grid, h('div', { class: 'card' }, t('h2', tr('Order value by {0}', label('channel', tr('channel')).toLowerCase())), t('div', tr('Selected period.'), 'scope'), hbars(channels.map(([k, v]) => ({ label: k, value: v })))));
+  const products = Object.entries(m.by_product).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const TOP_PRODUCTS = 10;
+  if (products.length) add(grid, h('div', { class: 'card' }, t('h2', tr('Order value by {0}', label('item', tr('product')).toLowerCase())),
+    t('div', products.length > TOP_PRODUCTS ? tr('Selected period. Top {0} of {1}.', TOP_PRODUCTS, products.length) : tr('Selected period.'), 'scope'),
+    hbars(products.slice(0, TOP_PRODUCTS).map(([k, v]) => ({ label: k, value: v })))));
   const next = openTasks().sort((a, b) => (a.action_date || '9999').localeCompare(b.action_date || '9999') || a.title.localeCompare(b.title)).slice(0, 6);
   add(grid, h('div', { class: 'card' }, t('h2', tr('Next actions')), t('div', tr('Open task suggestions by action date.'), 'scope'),
     next.length ? h('ul', { class: 'list' }, ...next.map(x => h('li', {}, h('a', { href: '#tasks' }, x.title), h('div', { class: 'small muted' }, `${x.action_date ? formatDate(x.action_date) : ''}${x.owner ? ' · ' + x.owner : ''} · `, statusChip(x.status))))) : t('p', tr('No open tasks.'), 'muted')));

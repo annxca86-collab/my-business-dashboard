@@ -51,6 +51,8 @@ for (const [business, day] of SCENARIOS) {
     assert.deepEqual(m.overdue_follow_up_ids, [...e.overdue_follow_up_ids].sort());
     assert.deepEqual(m.unassigned_prospect_ids, [...e.unassigned_prospect_ids].sort());
     assert.equal(m.negative_balance_count, 0);
+    // Order value by product splits the period's order value without losing or adding any.
+    assert.equal(Object.values(m.by_product).reduce((a, v) => a + v, 0), m.period_order_value);
     const story = m.balances.find(b => b.sale_id === 'BS-001');
     assert.equal(story ? story.balance : 0, cents(e.story_sale_balance));
   });
